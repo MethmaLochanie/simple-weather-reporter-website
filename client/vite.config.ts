@@ -8,4 +8,8 @@ export default defineConfig({
   tailwindcss()
 
   ],
+  server: {
+    host: true,       // 👈 Accept external connections (needed for Docker)
+    port: 3000        // 👈 Make it consistent for browser access
+  }
 });
