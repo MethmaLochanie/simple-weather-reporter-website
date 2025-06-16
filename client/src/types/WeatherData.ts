@@ -6,4 +6,5 @@ export interface WeatherData {
   condition: string;
   icon: string;
   location: string;
+  source?: 'cache';
 }
