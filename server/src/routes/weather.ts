@@ -7,4 +7,5 @@ const router = Router();
 
 router.get('/', validateCity, getWeather);
 
+
 export default router;
