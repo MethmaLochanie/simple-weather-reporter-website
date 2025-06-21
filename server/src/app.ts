@@ -5,10 +5,14 @@ import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 
+// Enable CORS for all routes
 app.use(cors());
+
+// Parse JSON bodies
 app.use(express.json());
 
-app.use('/api/weather', weatherRoutes);
+// Routes
+app.use('/api', weatherRoutes);
 
 app.use(errorHandler);
 
