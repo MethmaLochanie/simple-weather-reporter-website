@@ -1,14 +1,14 @@
-import './App.css'
+import React from 'react';
+import Weather from './components/Weather';
+import 'antd/dist/reset.css';
+import './index.css';
 
-function App() {
-
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-      </div>
-      
-    </>
-  )
-}
+    <div className="App">
+      <Weather />
+    </div>
+  );
+};
 
-export default App
+export default App;
