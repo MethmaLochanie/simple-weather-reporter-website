@@ -5,7 +5,7 @@ import { validateCity } from '../middleware/validateCity';
 
 const router = Router();
 
-router.get('/weather', validateCity, getWeather);
+router.get('/', validateCity, getWeather);
 
 
 export default router;
