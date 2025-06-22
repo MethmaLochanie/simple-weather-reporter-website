@@ -1,21 +1,20 @@
 import express from 'express';
-import { AuthController } from '../controllers/authController';
+import { register, verifyEmail, login, getProfile } from '../controllers/authController';
 import { authMiddleware } from '../middleware/auth';
 import { validateRegistration, validateLogin, validateVerificationToken } from '../middleware/validation';
 
 const router = express.Router();
-const authController = new AuthController();
 
 // Register user
-router.post('/register', validateRegistration, (req, res) => authController.register(req, res));
+router.post('/register', validateRegistration, register);
 
 // Verify email
-router.get('/verify', validateVerificationToken, (req, res) => authController.verifyEmail(req, res));
+router.get('/verify', validateVerificationToken, verifyEmail);
 
 // Login user
-router.post('/login', validateLogin, (req, res) => authController.login(req, res));
+router.post('/login', validateLogin, login);
 
 // Get user profile (protected route)
-router.get('/profile', authMiddleware, (req, res) => authController.getProfile(req, res));
+router.get('/profile', authMiddleware, getProfile);
 
 export default router; 
