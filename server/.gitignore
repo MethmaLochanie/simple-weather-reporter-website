@@ -28,6 +28,3 @@ yarn-error.log*
 
 # Tailwind JIT cache
 .tailwind/
-node_modules/
-dist
-.env
