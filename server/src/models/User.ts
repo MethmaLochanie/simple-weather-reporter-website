@@ -36,8 +36,7 @@ const userSchema = new Schema<IUser>({
     default: false
   },
   verificationToken: {
-    type: String,
-    default: null
+    type: String
   }
 }, {
   timestamps: true
