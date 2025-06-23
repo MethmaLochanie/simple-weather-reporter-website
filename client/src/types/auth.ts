@@ -5,6 +5,11 @@ export interface User {
   isVerified: boolean;
   createdAt?: string;
   updatedAt?: string;
+  location?: {
+    latitude: number;
+    longitude: number;
+    lastLocationUpdate: string;
+  };
 }
 
 export interface AuthFormData {
@@ -39,4 +44,5 @@ export interface AuthContextType {
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   verifyEmail: (token: string) => Promise<{ message: string }>;
+  setUser: (user: User | null) => void;
 } 

@@ -47,7 +47,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       localStorage.setItem('authToken', authToken);
       setToken(authToken);
-      setUser(userData);
+      const profile = await userApis.getProfile();
+      setUser(profile);
     } catch (error) {
       throw error;
     }
@@ -84,6 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     verifyEmail,
+    setUser,
   };
 
   return (
