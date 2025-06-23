@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { getUserProfile, updateUserLocation } from '../services/userService';
+import { getUserProfile, updateUserLocation, getUserSearchHistory, addUserSearchHistory } from '../services/userService';
 import { AuthRequest } from '../middleware/auth';
 
 // Get user profile
@@ -54,5 +54,49 @@ export const updateLocation = async (req: AuthRequest, res: Response): Promise<v
   } catch (error) {
     console.error('Update location controller error:', error);
     res.status(500).json({ error: 'Failed to update location' });
+  }
+}; 
+
+// Get user search history for a city
+export const getSearchHistory = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { city } = req.query;
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+    if (!city || typeof city !== 'string') {
+      res.status(400).json({ error: 'City is required' });
+      return;
+    }
+    const entry = await getUserSearchHistory(userId, city);
+    if (entry) {
+      res.json(entry);
+    } else {
+      res.status(404).json({ error: 'Not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get search history' });
+  }
+};
+
+// Add to user search history
+export const addSearchHistory = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.userId;
+    const { city, country, lat, lng } = req.body;
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+    if (!city || !country || typeof lat !== 'number' || typeof lng !== 'number') {
+      res.status(400).json({ error: 'city, country, lat, and lng are required' });
+      return;
+    }
+    await addUserSearchHistory(userId, { city, country, lat, lng, searchedAt: new Date() });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add search history' });
   }
 }; 
