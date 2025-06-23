@@ -6,6 +6,11 @@ export const userApis = {
     const response = await api.get('/user/profile');
     return response.data;
   },
+  // Update user location (requires authentication)
+  updateLocation: async (latitude: number, longitude: number) => {
+    const response = await api.post('/user/location', { latitude, longitude });
+    return response.data;
+  },
 };
 
 export default userApis; 
