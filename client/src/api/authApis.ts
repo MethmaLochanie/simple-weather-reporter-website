@@ -26,11 +26,6 @@ export const authApi = {
     return response.data;
   },
 
-  // Get user profile (requires authentication)
-  getProfile: async () => {
-    const response = await api.get('/auth/profile');
-    return response.data;
-  },
 };
 
 export default authApi; 

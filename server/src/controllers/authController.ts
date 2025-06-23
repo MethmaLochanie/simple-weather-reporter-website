@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, verifyEmail as verifyEmailService, loginUser, getUserProfile } from '../services/authService';
-import { AuthRequest } from '../middleware/auth';
+import { registerUser, verifyEmail as verifyEmailService, loginUser } from '../services/authService';
 
 // Register user
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -64,26 +63,3 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: 'Login failed. Please try again.' });
   }
 };
-
-// Get user profile
-export const getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      res.status(401).json({ error: 'User not authenticated' });
-      return;
-    }
-
-    const result = await getUserProfile(userId);
-    
-    if (result.success) {
-      res.json(result.user);
-    } else {
-      res.status(404).json({ error: result.error });
-    }
-  } catch (error) {
-    console.error('Profile controller error:', error);
-    res.status(500).json({ error: 'Failed to fetch profile' });
-  }
-}; 
