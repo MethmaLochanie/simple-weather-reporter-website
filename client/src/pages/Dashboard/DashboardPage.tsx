@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Button, theme } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Layout, Menu, Button, theme, message } from 'antd';
 import { 
   UserOutlined, 
   CloudOutlined, 
@@ -10,16 +10,55 @@ import Weather from '../../components/Weather/Weather';
 import UserProfile from '../../components/UserProfile/UserProfile';
 import GradientCloudIcon from '../../components/Icons/GradientCloudIcon';
 import { useNavigate } from 'react-router-dom';
+import userApis from '../../api/userApis';
 
 const { Header, Content, Sider } = Layout;
 
 const DashboardPage: React.FC = () => {
-  const { logout, user } = useAuth();
+  const { logout, user, setUser } = useAuth();
   const [currentView, setCurrentView] = useState('weather');
   const navigate = useNavigate();
   const {
     token: { borderRadiusLG },
   } = theme.useToken();
+  const locationUpdateAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    if (!user) return;
+    if (!navigator.geolocation) return;
+    if (locationUpdateAttemptedRef.current) return;
+
+    // Only run if location is missing or invalid
+    const last = user.location;
+    const needsLocation =
+      !last ||
+      typeof last.latitude !== 'number' ||
+      typeof last.longitude !== 'number';
+
+    if (!needsLocation) {
+      locationUpdateAttemptedRef.current = true;
+      return;
+    }
+
+    locationUpdateAttemptedRef.current = true; // Set immediately to prevent race
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const res = await userApis.updateLocation(latitude, longitude);
+          const updatedProfile = await userApis.getProfile();
+          setUser(updatedProfile);
+          message.success(res.message);
+        } catch (err) {
+          message.error('Failed to update location');
+        }
+      },
+      (error) => {
+        // User denied location or error occurred: do nothing
+      },
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
+    );
+  }, [user, setUser]);
 
   const handleLogout = () => {
     logout();

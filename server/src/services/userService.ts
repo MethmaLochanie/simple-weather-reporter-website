@@ -14,7 +14,8 @@ export const getUserProfile = async (userId: string): Promise<AuthResult> => {
       _id: 1,
       username: 1,
       email: 1,
-      isVerified: 1
+      isVerified: 1,
+      location: 1
     });
 
     if (!user) {
@@ -27,7 +28,8 @@ export const getUserProfile = async (userId: string): Promise<AuthResult> => {
         id: user._id.toString(),
         username: user.username,
         email: user.email,
-        isVerified: user.isVerified
+        isVerified: user.isVerified,
+        location: user.location
       }
     };
   } catch (error) {
