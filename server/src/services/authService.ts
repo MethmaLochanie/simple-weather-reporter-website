@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
 import { sendVerificationEmail } from './emailService';
 
-interface AuthResult {
+export interface AuthResult {
   success: boolean;
   message?: string;
   error?: string;
@@ -117,35 +117,6 @@ export const loginUser = async (email: string, password: string): Promise<AuthRe
     };
   } catch (error) {
     console.error('AuthService loginUser error:', error);
-    throw error;
-  }
-};
-
-// Get user profile
-export const getUserProfile = async (userId: string): Promise<AuthResult> => {
-  try {
-    const user = await User.findById(userId).select({
-      _id: 1,
-      username: 1,
-      email: 1,
-      isVerified: 1
-    });
-
-    if (!user) {
-      return { success: false, error: 'User not found' };
-    }
-
-    return {
-      success: true,
-      user: {
-        id: user._id.toString(),
-        username: user.username,
-        email: user.email,
-        isVerified: user.isVerified
-      }
-    };
-  } catch (error) {
-    console.error('AuthService getUserProfile error:', error);
     throw error;
   }
 };
