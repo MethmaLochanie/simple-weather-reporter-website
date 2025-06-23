@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Card, Spin, Alert } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import { useWeather } from '../hooks/useWeather';
+import { useWeather } from '../../hooks/useWeather';
 
 const Weather: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
