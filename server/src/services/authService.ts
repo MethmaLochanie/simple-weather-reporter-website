@@ -15,7 +15,6 @@ interface AuthResult {
 // Register new user
 export const registerUser = async (username: string, email: string, password: string): Promise<AuthResult> => {
   try {
-    // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ email: email.toLowerCase() }, { username }]
     });
@@ -39,13 +38,10 @@ export const registerUser = async (username: string, email: string, password: st
       verificationToken,
       isVerified: false
     });
-
     await user.save();
-
-    // Use backend URL for verification instead of frontend
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
-    const verificationLink = `${backendUrl}/api/verify?token=${verificationToken}`;
-    await sendVerificationEmail(email, verificationLink);
+    const verificationLink = `${process.env.FRONTEND_URL}/verify?token=${verificationToken}`;
+    
+    await sendVerificationEmail(user.email, verificationLink);
 
     return { 
       success: true, 
@@ -63,29 +59,26 @@ export const verifyEmail = async (token: string): Promise<AuthResult> => {
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
-      return { success: false, error: 'Invalid or expired verification token' };
+      return { success: false, error: 'Invalid or expired verification token. Please try registering again.' };
     }
 
     if (user.isVerified) {
-      return { success: false, error: 'Email was already verified' };
+      return { success: true, message: 'Your email has already been verified. You can now log in.' };
     }
 
-    // Update user to verified
     user.isVerified = true;
     user.verificationToken = undefined;
     await user.save();
 
     return { success: true, message: 'Email verified successfully! You can now log in.' };
   } catch (error) {
-    console.error('AuthService verifyEmail error:', error);
-    throw error;
+    throw new Error('An unexpected error occurred during email verification.');
   }
 };
 
 // Login user
 export const loginUser = async (email: string, password: string): Promise<AuthResult> => {
   try {
-    // Try to find user by email or username
     const user = await User.findOne({
       $or: [
         { email: email.toLowerCase() },
@@ -106,7 +99,6 @@ export const loginUser = async (email: string, password: string): Promise<AuthRe
       return { success: false, error: 'Invalid credentials' };
     }
 
-    // User is authenticated, create JWT
     const token = jwt.sign(
       { userId: user._id.toString(), username: user.username },
       process.env.JWT_SECRET as string,

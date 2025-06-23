@@ -10,8 +10,15 @@ export const validateRegistration = (req: Request, res: Response, next: NextFunc
   }
 
   // Validate username length
-  if (username.length < 3) {
-    res.status(400).json({ error: 'Username must be at least 3 characters long' });
+  if (username.length < 3 || username.length > 20) {
+    res.status(400).json({ error: 'Username must be between 3 and 20 characters long' });
+    return;
+  }
+
+  // Validate username format (letters, numbers, underscores only)
+  const usernameRegex = /^[a-zA-Z0-9_]+$/;
+  if (!usernameRegex.test(username)) {
+    res.status(400).json({ error: 'Username can only contain letters, numbers, and underscores' });
     return;
   }
 
@@ -23,8 +30,34 @@ export const validateRegistration = (req: Request, res: Response, next: NextFunc
   }
 
   // Validate password length
-  if (password.length < 6) {
-    res.status(400).json({ error: 'Password must be at least 6 characters long' });
+  if (password.length < 8) {
+    res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    return;
+  }
+
+  // Validate password complexity
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (!hasUpperCase) {
+    res.status(400).json({ error: 'Password must contain at least one uppercase letter' });
+    return;
+  }
+
+  if (!hasLowerCase) {
+    res.status(400).json({ error: 'Password must contain at least one lowercase letter' });
+    return;
+  }
+
+  if (!hasNumbers) {
+    res.status(400).json({ error: 'Password must contain at least one number' });
+    return;
+  }
+
+  if (!hasSpecialChar) {
+    res.status(400).json({ error: 'Password must contain at least one special character' });
     return;
   }
 
