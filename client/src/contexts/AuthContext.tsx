@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { authApi } from '../api/authApi';
+import { authApi } from '../api/authApis';
 import type { User, AuthContextType } from '../types/auth';
+import userApis from '../api/userApis';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -27,7 +28,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const verifyToken = async () => {
     try {
-      const userData = await authApi.getProfile();
+      const userData = await userApis.getProfile();
       setUser(userData);
     } catch (error) {
       // Token is invalid, remove it

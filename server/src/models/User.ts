@@ -9,6 +9,11 @@ export interface IUser extends Document {
   verificationToken?: string;
   createdAt: Date;
   updatedAt: Date;
+  location?: {
+    latitude: number;
+    longitude: number;
+    lastLocationUpdate: Date;
+  };
 }
 
 const userSchema = new Schema<IUser>({
@@ -37,6 +42,11 @@ const userSchema = new Schema<IUser>({
   },
   verificationToken: {
     type: String
+  },
+  location: {
+    latitude: { type: Number },
+    longitude: { type: Number },
+    lastLocationUpdate: { type: Date }
   }
 }, {
   timestamps: true

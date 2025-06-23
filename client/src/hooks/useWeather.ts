@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { weatherApi } from '../api/weatherApi';
+import { weatherApi } from '../api/weatherApis';
 import type { WeatherData } from '../types/weather';
 
 export const useWeather = (city: string | null) => {
