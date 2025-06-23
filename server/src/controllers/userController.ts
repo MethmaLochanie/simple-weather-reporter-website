@@ -37,6 +37,14 @@ export const updateLocation = async (req: AuthRequest, res: Response): Promise<v
       res.status(400).json({ error: 'Invalid latitude or longitude' });
       return;
     }
+    if (latitude < -90 || latitude > 90) {
+      res.status(400).json({ error: 'Latitude must be between -90 and 90' });
+      return;
+    }
+    if (longitude < -180 || longitude > 180) {
+      res.status(400).json({ error: 'Longitude must be between -180 and 180' });
+      return;
+    }
     const result = await updateUserLocation(userId, latitude, longitude);
     if (result.success) {
       res.json({ message: result.message });
