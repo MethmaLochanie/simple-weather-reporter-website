@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { registerUser, verifyEmail as verifyEmailService, loginUser, getUserProfile } from '../services/authService';
 import { AuthRequest } from '../middleware/auth';
-import { generateHtmlResponse } from '../helpers/htmlTemplates';
 
 // Register user
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -34,23 +33,10 @@ export const verifyEmail = async (req: Request, res: Response): Promise<void> =>
     const { token } = req.query as { token: string };
     const result = await verifyEmailService(token);
     
-    res.setHeader('Content-Type', 'text/html');
-    
     if (result.success) {
-      const html = generateHtmlResponse(
-        true, 
-        'Email Verified Successfully!', 
-        result.message || 'Email verified successfully!'
-      );
-      res.send(html);
+      res.status(200).json({ message: result.message });
     } else {
-      const html = generateHtmlResponse(
-        false, 
-        'Verification Failed', 
-        '', 
-        result.error
-      );
-      res.status(400).send(html);
+      res.status(400).json({ error: result.error });
     }
   } catch (error) {
     console.error('Verification controller error:', error);
