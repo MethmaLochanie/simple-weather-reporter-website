@@ -14,6 +14,9 @@ export default {
         'xl': '1280px',
         '2xl': '1536px',
       },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+      },
     },
   },
   plugins: [],

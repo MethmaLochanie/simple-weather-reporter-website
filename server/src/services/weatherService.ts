@@ -17,8 +17,8 @@ export const fetchCurrentWeather = async (city: string): Promise<WeatherData> =>
     }
 
 
-    const BASE_URL = process.env.BASE_URL;
-    const url = `${BASE_URL}/current.json?key=${API_KEY}&q=${encodeURIComponent(
+    const WEATHER_API_URL = process.env.WEATHER_API_URL;
+    const url = `${WEATHER_API_URL}/current.json?key=${API_KEY}&q=${encodeURIComponent(
         city
     )}&aqi=yes`;
 
