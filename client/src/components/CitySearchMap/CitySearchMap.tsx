@@ -7,14 +7,23 @@ const defaultCenter = { lat: 6.9271, lng: 79.8612 }; // Colombo
 
 interface CitySearchMapProps {
   onCitySelect?: (city: CityType) => void;
+  value?: string;
+  onChange?: (value: string) => void;
+  initialCenter?: { lat: number; lng: number };
 }
 
-const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect }) => {
-  const [searchValue, setSearchValue] = useState('');
+const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect, value, onChange, initialCenter }) => {
   const [selectedPlace, setSelectedPlace] = useState<google.maps.places.PlaceResult | null>(null);
-  const [center, setCenter] = useState(defaultCenter);
-  const [markerPos, setMarkerPos] = useState<{ lat: number; lng: number } | null>(defaultCenter);
+  const [center, setCenter] = useState(initialCenter || defaultCenter);
+  const [markerPos, setMarkerPos] = useState<{ lat: number; lng: number } | null>(initialCenter || defaultCenter);
   const searchBoxRef = useRef<google.maps.places.SearchBox | null>(null);
+
+  React.useEffect(() => {
+    if (initialCenter) {
+      setCenter(initialCenter);
+      setMarkerPos(initialCenter);
+    }
+  }, [initialCenter]);
 
   const handlePlacesChanged = () => {
     if (searchBoxRef.current) {
@@ -22,7 +31,9 @@ const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect }) => {
       if (places && places.length > 0) {
         const place = places[0];
         setSelectedPlace(place);
-        setSearchValue(place.formatted_address || place.name || '');
+        if (onChange) {
+          onChange(place.formatted_address || place.name || '');
+        }
         if (place.geometry && place.geometry.location) {
           const lat = place.geometry.location.lat();
           const lng = place.geometry.location.lng();
@@ -30,7 +41,7 @@ const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect }) => {
           setMarkerPos({ lat, lng });
           if (onCitySelect) {
             onCitySelect({
-              name: place.name || '',
+              name: place.name || place.formatted_address || '',
               lat,
               lng,
               country: place.address_components?.find((c: any) => c.types.includes('country'))?.long_name || '',
@@ -60,8 +71,8 @@ const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect }) => {
             <input
               type="text"
               placeholder="Search for a city, country, or district..."
-              value={searchValue}
-              onChange={e => setSearchValue(e.target.value)}
+              value={value}
+              onChange={e => onChange && onChange(e.target.value)}
               className="w-full h-12 pl-4 pr-12 rounded-lg border border-gray-300 bg-white text-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
               autoComplete="off"
             />

@@ -12,10 +12,12 @@ const getInitialCity = () => {
 
 const Weather: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState<CityType | null>(getInitialCity);
+  const [searchValue, setSearchValue] = useState(selectedCity?.name || '');
   const { data: weatherData, isLoading: weatherLoading, error: weatherError } = useWeather(selectedCity?.name ?? null);
 
   const handleCitySelect = (city: CityType) => {
     setSelectedCity(city);
+    setSearchValue(city.name);
     localStorage.setItem('selectedCity', JSON.stringify(city));
   };
 
@@ -25,7 +27,12 @@ const Weather: React.FC = () => {
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-800">
           Weather Reporter
         </h1>
-        <CitySearchMap onCitySelect={handleCitySelect} />
+        <CitySearchMap 
+          onCitySelect={handleCitySelect} 
+          value={searchValue}
+          onChange={setSearchValue}
+          initialCenter={selectedCity ? { lat: selectedCity.lat, lng: selectedCity.lng } : undefined}
+        />
         {weatherError && (
           <div className="mb-4 text-red-600 text-center">{weatherError.message}</div>
         )}
