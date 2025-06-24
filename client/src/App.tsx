@@ -21,7 +21,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={['places' as const]}>
+    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={['places' as const]} loadingElement={<Loader />}>
       <Routes>
         <Route
           path="/"

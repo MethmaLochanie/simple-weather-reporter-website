@@ -73,7 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading }) => {
           loading={loading}
           className="w-full h-12 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 border-0 text-white font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:-translate-y-0.5"
         >
-          {loading ? <LoadingOutlined /> : 'Sign In'}
+          Sign In
         </Button>
       </Form.Item>
     </Form>
