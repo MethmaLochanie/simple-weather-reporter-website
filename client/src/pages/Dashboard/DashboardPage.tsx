@@ -5,23 +5,29 @@ import {
   CloudOutlined, 
   LogoutOutlined 
 } from '@ant-design/icons';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext/AuthContext';
 import Weather from '../../components/Weather/Weather';
 import UserProfile from '../../components/UserProfile/UserProfile';
 import GradientCloudIcon from '../../components/Icons/GradientCloudIcon';
 import { useNavigate } from 'react-router-dom';
 import userApis from '../../api/userApis';
+import { useLoading } from '../../contexts/LoadingContext/LoadingContext';
 
 const { Header, Content, Sider } = Layout;
 
 const DashboardPage: React.FC = () => {
-  const { logout, user, setUser } = useAuth();
+  const { logout, user, setUser, isLoading } = useAuth();
+  const { setLoading } = useLoading();
   const [currentView, setCurrentView] = useState('weather');
   const navigate = useNavigate();
   const {
     token: { borderRadiusLG },
   } = theme.useToken();
   const locationUpdateAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
   useEffect(() => {
     if (!user) return;
@@ -41,6 +47,7 @@ const DashboardPage: React.FC = () => {
     }
 
     locationUpdateAttemptedRef.current = true; // Set immediately to prevent race
+    setLoading(true);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
@@ -51,14 +58,17 @@ const DashboardPage: React.FC = () => {
           message.success(res.message);
         } catch (err) {
           message.error('Failed to update location');
+        } finally {
+          setLoading(false);
         }
       },
       (error) => {
+        setLoading(false);
         // User denied location or error occurred: do nothing
       },
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
     );
-  }, [user, setUser]);
+  }, [user, setUser, setLoading]);
 
   const handleLogout = () => {
     logout();
@@ -125,7 +135,7 @@ const DashboardPage: React.FC = () => {
             }}
           >
             {currentView === 'weather' && <Weather />}
-            {currentView === 'profile' && <UserProfile user={user} />}
+            {currentView === 'profile' && <UserProfile />}
           </Content>
         </Layout>
       </Layout>
