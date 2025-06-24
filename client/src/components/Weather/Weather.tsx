@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
-import { Input, Card, Spin, Alert } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Card } from 'antd';
 import { useWeather } from '../../hooks/useWeather';
+import CitySearchMap from '../CitySearchMap/CitySearchMap';
+import Loader from '../Loader/Loader';
+import type { CityType } from '../../types/weather';
+
+const getInitialCity = () => {
+  const saved = localStorage.getItem('selectedCity');
+  return saved ? JSON.parse(saved) : null;
+};
 
 const Weather: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState<string | null>(null);
-  const { data: weatherData, isLoading, error } = useWeather(searchQuery);
+  const [selectedCity, setSelectedCity] = useState<CityType | null>(getInitialCity);
+  const { data: weatherData, isLoading: weatherLoading, error: weatherError } = useWeather(selectedCity?.name ?? null);
 
-  const handleSearch = (value: string) => {
-    if (!value.trim()) return;
-    setSearchQuery(value);
+  const handleCitySelect = (city: CityType) => {
+    setSelectedCity(city);
+    localStorage.setItem('selectedCity', JSON.stringify(city));
   };
 
   return (
@@ -18,35 +25,18 @@ const Weather: React.FC = () => {
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6 md:mb-8 text-gray-800">
           Weather Reporter
         </h1>
-        
-        <div className="mb-6 sm:mb-8">
-          <Input.Search
-            placeholder="Enter city name"
-            enterButton={<SearchOutlined />}
-            size="large"
-            onSearch={handleSearch}
-            className="rounded-lg shadow-lg w-full"
-          />
-        </div>
-
-        {error && (
-          <Alert
-            message="Error"
-            description={error.message}
-            type="error"
-            showIcon
-            className="mb-4"
-          />
+        <CitySearchMap onCitySelect={handleCitySelect} />
+        {weatherError && (
+          <div className="mb-4 text-red-600 text-center">{weatherError.message}</div>
         )}
-
-        {isLoading ? (
+        {weatherLoading ? (
           <div className="flex justify-center">
-            <Spin size="large" />
+            <Loader />
           </div>
-        ) : weatherData ? (
-          <Card className="shadow-xl rounded-lg">
+        ) : weatherData && selectedCity ? (
+          <Card className="shadow-xl rounded-lg mb-6">
             <div className="text-center p-4 sm:p-6">
-              <h2 className="text-2xl sm:text-3xl font-semibold mb-3 sm:mb-4">{weatherData.location}</h2>
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-3 sm:mb-4">{selectedCity.name}</h2>
               <img
                 src={`https:${weatherData.icon}`}
                 alt={weatherData.condition}
@@ -54,7 +44,6 @@ const Weather: React.FC = () => {
               />
               <p className="text-xl sm:text-2xl font-medium mb-2">{weatherData.condition}</p>
               <p className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6">{weatherData.temperature}°C</p>
-              
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-6">
                 <div className="bg-white/50 rounded-lg p-3 sm:p-4">
                   <p className="text-gray-600 text-sm sm:text-base">Humidity</p>
