@@ -126,7 +126,7 @@ const Weather: React.FC = () => {
         <CitySearchMap 
           onCitySelect={handleCitySelect} 
           value={searchValue}
-          onChange={val => { setSearchValue(val); setHasSearched(true); }}
+          onChange={setSearchValue}
           initialCenter={selectedCity ? { lat: selectedCity.lat, lng: selectedCity.lng } : undefined}
         />
         {weatherError && (
