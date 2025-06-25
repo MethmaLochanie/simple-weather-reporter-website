@@ -13,4 +13,5 @@ router.post('/location', authMiddleware, locationRateLimiter, updateLocation);
 // // Add to user search history (protected route)
 // router.post('/search-history', authMiddleware, addSearchHistory);
 
+
 export default router; 
