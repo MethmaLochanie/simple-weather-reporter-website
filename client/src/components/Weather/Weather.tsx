@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useWeather } from '../../hooks/useWeather';
 import CitySearchMap from '../CitySearchMap/CitySearchMap';
 import type { CityType } from '../../types/weather';
@@ -21,6 +21,7 @@ const Weather: React.FC = () => {
   const [dbLocation, setDbLocation] = useState<CityType | null>(getInitialCity);
   const [infoBoxMsg, setInfoBoxMsg] = useState<string | null>(null);
   const { setLoading } = useLoading();
+  const lastLocationCoords = useRef<string>(''); // Track last location coordinates
 
   const { data: weatherData, isLoading: weatherLoading, error: weatherError } = useWeather(selectedCity?.name ?? null);
 
@@ -65,6 +66,15 @@ const Weather: React.FC = () => {
         async (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
+          const coordsKey = `${lat.toFixed(4)},${lng.toFixed(4)}`;
+          
+          // Check if we already have this location cached
+          if (coordsKey === lastLocationCoords.current && selectedCity?.name && selectedCity.name !== 'Current Location') {
+            // Use existing city data if coordinates haven't changed
+            setInfoBoxMsg(null);
+            return;
+          }
+
           let name = '';
           try {
             const geoLocationName = await fetchReverseGeocode(lat, lng);
@@ -80,12 +90,14 @@ const Weather: React.FC = () => {
           } catch {
             name = '';
           }
+          
           const city: CityType = { name, lat, lng };
           setSelectedCity(city);
           setSearchValue(name);
           setHasSearched(false);
           setInfoBoxMsg(null);
           localStorage.setItem('selectedCity', JSON.stringify(city));
+          lastLocationCoords.current = coordsKey;
         },
         () => {
           if (dbLocation && dbLocation.lat && dbLocation.lng) {

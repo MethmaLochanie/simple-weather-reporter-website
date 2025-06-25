@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext/AuthContext';
 import { fetchReverseGeocode } from '../../hooks/useReverseGeocode';
 import LocationStatus from '../LocationStatus/LocationStatus';
 import LocationInfoBox from '../LocationInfoBox/LocationInfoBox';
 import { useLocationStatus } from '../../hooks/useLocationStatus';
-import userApis from '../../api/userApis';
+import { userApis } from '../../api/userApis';
 import { useLoading } from '../../contexts/LoadingContext/LoadingContext';
 import UserProfileTitle from './UserProfileTitle';
 import UserProfileCard from './UserProfileCard';
@@ -27,6 +27,7 @@ const UserProfile: React.FC = () => {
   const [liveLocation, setLiveLocation] = useState<{ latitude: number; longitude: number; lastLocationUpdate: string } | null>(null);
   const [locationName, setLocationName] = useState<string>('');
   const [loading, setLocalLoading] = useState<boolean>(false);
+  const lastProcessedCoords = useRef<string>(''); // Track last processed coordinates
 
   useEffect(() => {
     setLoading(loading);
@@ -43,6 +44,7 @@ const UserProfile: React.FC = () => {
     navigator.geolocation.getCurrentPosition(
       async (position: GeolocationPosition) => {
         const { latitude, longitude } = position.coords;
+        const coordsKey = `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
         if (!areCoordsEqual({ latitude, longitude }, user.location)) {
           setLocalLoading(true);
           try {
@@ -50,8 +52,10 @@ const UserProfile: React.FC = () => {
             const updatedProfile = await userApis.getProfile();
             setUser(updatedProfile);
             setLiveLocation({ latitude, longitude, lastLocationUpdate: new Date().toISOString() });
+            lastProcessedCoords.current = coordsKey;
           } catch {
             setLiveLocation({ latitude, longitude, lastLocationUpdate: new Date().toISOString() });
+            lastProcessedCoords.current = coordsKey;
           } finally {
             setLocalLoading(false);
           }
@@ -80,6 +84,11 @@ const UserProfile: React.FC = () => {
       setLocationName('');
       return;
     }
+    const coordsKey = `${loc.latitude.toFixed(4)},${loc.longitude.toFixed(4)}`;
+    // Only fetch if coordinates have changed
+    if (coordsKey === lastProcessedCoords.current && locationName) {
+      return; // Use existing location name
+    }
     let ignore = false;
     (async () => {
       setLocalLoading(true);
@@ -92,6 +101,7 @@ const UserProfile: React.FC = () => {
         } else {
           setLocationName(`${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}`);
         }
+        lastProcessedCoords.current = coordsKey;
       }
       setLocalLoading(false);
     })();

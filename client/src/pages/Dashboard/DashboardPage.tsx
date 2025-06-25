@@ -10,7 +10,7 @@ import Weather from '../../components/Weather/Weather';
 import UserProfile from '../../components/UserProfile/UserProfile';
 import GradientCloudIcon from '../../components/Icons/GradientCloudIcon';
 import { useNavigate } from 'react-router-dom';
-import userApis from '../../api/userApis';
+import { userApis } from '../../api/userApis';
 import { useLoading } from '../../contexts/LoadingContext/LoadingContext';
 
 const { Header, Content, Sider } = Layout;

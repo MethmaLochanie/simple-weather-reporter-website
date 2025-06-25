@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { StandaloneSearchBox, GoogleMap, Marker } from '@react-google-maps/api';
 import { SearchOutlined } from '@ant-design/icons';
 import type { CityType } from '../../types/weather';
@@ -11,6 +11,18 @@ interface CitySearchMapProps {
   onChange?: (value: string) => void;
   initialCenter?: { lat: number; lng: number };
 }
+
+// Debounce function to limit API calls
+const useDebounce = (callback: Function, delay: number) => {
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  
+  return useCallback((...args: any[]) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => callback(...args), delay);
+  }, [callback, delay]);
+};
 
 const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect, value, onChange, initialCenter }) => {
   const [center, setCenter] = useState(initialCenter || defaultCenter);
@@ -50,12 +62,29 @@ const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect, value, onCh
     }
   };
 
+  // Debounced input change handler
+  const debouncedOnChange = useDebounce((newValue: string) => {
+    if (onChange) {
+      onChange(newValue);
+    }
+  }, 500); // 500ms delay
+
   const onLoad = (ref: google.maps.places.SearchBox) => {
     searchBoxRef.current = ref;
   };
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    // Update the input value immediately for UI responsiveness
+    if (onChange) {
+      onChange(newValue);
+    }
+    // Debounce the actual search trigger
+    debouncedOnChange(newValue);
   };
 
   return (
@@ -70,7 +99,7 @@ const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect, value, onCh
               type="text"
               placeholder="Search for a city, country, or district..."
               value={value}
-              onChange={e => onChange && onChange(e.target.value)}
+              onChange={handleInputChange}
               className="w-full h-12 pl-4 pr-12 rounded-lg border border-gray-300 bg-white text-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
               autoComplete="off"
             />
