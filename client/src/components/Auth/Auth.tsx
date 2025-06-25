@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Tabs, message } from 'antd';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { AuthFormData } from '../../types/auth';
 import LoginForm from './LoginForm/LoginForm';

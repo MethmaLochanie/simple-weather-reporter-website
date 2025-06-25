@@ -6,4 +6,11 @@ export interface WeatherData {
   condition: string;
   icon: string;
   location: string;
+}
+
+export interface CityType {
+  name: string;
+  lat: number;
+  lng: number;
+  country?: string;
 } 

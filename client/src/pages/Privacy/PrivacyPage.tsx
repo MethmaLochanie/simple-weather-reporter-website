@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Typography, Card, Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useLoading } from '../../contexts/LoadingContext/LoadingContext';
 
 const { Title, Paragraph, Text } = Typography;
 
 const PrivacyPage: React.FC = () => {
+  const { setLoading } = useLoading();
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => {
+      clearTimeout(timer);
+      setLoading(false);
+    };
+  }, [setLoading]);
   const navigate = useNavigate();
 
   const handleBack = () => {
