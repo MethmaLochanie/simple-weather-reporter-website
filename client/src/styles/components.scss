@@ -50,11 +50,6 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
 
-  // Loading animation
-  .ant-spin-dot-item {
-    @apply bg-blue-500;
-  }
-
   // Alert styles
   .ant-alert {
     @apply rounded-lg border-0;

@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { features, benefits, type Feature } from '../../data/features';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext/AuthContext';
 
 const { Title, Paragraph, Text } = Typography;
 

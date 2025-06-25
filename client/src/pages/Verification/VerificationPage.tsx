@@ -1,17 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext/AuthContext';
 import { Card, Result, Button, Spin } from 'antd';
 import AuthHeader from '../../components/Auth/Header/AuthHeader';
+import { useLoading } from '../../contexts/LoadingContext/LoadingContext';
 
 const VerificationPage: React.FC = () => {
   const { verifyEmail } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { setLoading } = useLoading();
   
   const [status, setStatus] = useState<'processing' | 'error'>('processing');
   const [message, setMessage] = useState('We are verifying your email, please wait...');
   const hasVerified = useRef(false);
+
+  useEffect(() => {
+    setLoading(status === 'processing');
+  }, [status, setLoading]);
 
   useEffect(() => {
     if (hasVerified.current) return;
