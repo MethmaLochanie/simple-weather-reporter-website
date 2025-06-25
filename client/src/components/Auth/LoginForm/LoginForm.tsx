@@ -4,8 +4,7 @@ import {
   MailOutlined, 
   LockOutlined, 
   EyeInvisibleOutlined, 
-  EyeTwoTone,
-  LoadingOutlined
+  EyeTwoTone
 } from '@ant-design/icons';
 import type { AuthFormData } from '../../../types/auth';
 

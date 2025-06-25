@@ -13,7 +13,6 @@ interface CitySearchMapProps {
 }
 
 const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect, value, onChange, initialCenter }) => {
-  const [selectedPlace, setSelectedPlace] = useState<google.maps.places.PlaceResult | null>(null);
   const [center, setCenter] = useState(initialCenter || defaultCenter);
   const [markerPos, setMarkerPos] = useState<{ lat: number; lng: number } | null>(initialCenter || defaultCenter);
   const searchBoxRef = useRef<google.maps.places.SearchBox | null>(null);
@@ -30,7 +29,6 @@ const CitySearchMap: React.FC<CitySearchMapProps> = ({ onCitySelect, value, onCh
       const places = searchBoxRef.current.getPlaces();
       if (places && places.length > 0) {
         const place = places[0];
-        setSelectedPlace(place);
         if (onChange) {
           onChange(place.formatted_address || place.name || '');
         }
