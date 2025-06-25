@@ -28,7 +28,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 // Basic Welcome Route
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Welcome to Weather Reporter API with MongoDB' });
+  res.json({ message: 'Welcome to Weather Reporter v12 API with MongoDB' });
 });
 
 app.use(errorHandler);
