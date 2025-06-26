@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext/AuthContext';
 import { fetchReverseGeocode } from '../../hooks/useReverseGeocode';
-import LocationStatus from '../LocationStatus/LocationStatus';
-import LocationInfoBox from '../LocationInfoBox/LocationInfoBox';
 import { useLocationStatus } from '../../hooks/useLocationStatus';
 import { userApis } from '../../api/userApis';
 import { useLoading } from '../../contexts/LoadingContext/LoadingContext';
 import UserProfileTitle from './UserProfileTitle';
 import UserProfileCard from './UserProfileCard';
+import WeatherInfoBox from '../Weather/WeatherInfoBox';
 
 const areCoordsEqual = (
   a: { latitude: number; longitude: number } | null | undefined,
@@ -116,18 +115,29 @@ const UserProfile: React.FC = () => {
   }
 
   return (
-    <div className="text-center py-8">
-      <LocationInfoBox />
-      <UserProfileTitle />
-      <LocationStatus source={locationSource} />
-      <UserProfileCard
-        username={user?.username}
-        email={user?.email}
-        isVerified={user?.isVerified}
-        location={loc}
-        locationName={locationName}
-        userLocationLastUpdate={user?.location?.lastLocationUpdate}
-      />
+    <div className="space-y-6">
+      {/* Location Info Box */}
+      <WeatherInfoBox message={"You have disabled location access. Enable it for more accurate weather updates."} />
+      
+      {/* Profile Header */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100/50">
+        <UserProfileTitle />
+      </div>
+      
+      {/* User Profile Card */}
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="p-6">
+          <UserProfileCard
+            username={user?.username}
+            email={user?.email}
+            isVerified={user?.isVerified}
+            location={loc}
+            locationName={locationName}
+            userLocationLastUpdate={user?.location?.lastLocationUpdate}
+            locationSource={locationSource}
+          />
+        </div>
+      </div>
     </div>
   );
 };

@@ -52,7 +52,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading }) => {
         />
       </Form.Item>
 
-      <Form.Item>
+      {/* <Form.Item>
         <Row justify="space-between" align="middle">
           <Col>
             <Form.Item name="remember" valuePropName="checked" noStyle>
@@ -63,7 +63,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading }) => {
             <a href="#" className="text-blue-600 hover:text-blue-800">Forgot password?</a>
           </Col>
         </Row>
-      </Form.Item>
+      </Form.Item> */}
 
       <Form.Item>
         <Button 

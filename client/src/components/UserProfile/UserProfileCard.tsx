@@ -9,6 +9,7 @@ interface UserProfileCardProps {
   location: { latitude: number; longitude: number; lastLocationUpdate?: string } | null;
   locationName: string;
   userLocationLastUpdate?: string;
+  locationSource?: 'live' | 'saved' | 'none';
 }
 
 const UserProfileCard: React.FC<UserProfileCardProps> = ({
@@ -17,10 +18,11 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
   isVerified,
   location,
   locationName,
-  userLocationLastUpdate
+  userLocationLastUpdate,
+  locationSource
 }) => {
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+    <div className="space-y-6">
       <UserProfileInfo 
         username={username}
         email={email}
@@ -30,6 +32,7 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
         location={location}
         locationName={locationName}
         userLocationLastUpdate={userLocationLastUpdate}
+        locationSource={locationSource}
       />
     </div>
   );
