@@ -1,5 +1,6 @@
 import React from 'react';
-import InfoBox from '../InfoBox/InfoBox';
+import { Alert } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 interface WeatherInfoBoxProps {
   message: string | null;
@@ -9,9 +10,16 @@ const WeatherInfoBox: React.FC<WeatherInfoBoxProps> = ({ message }) => {
   if (!message) return null;
   
   return (
-    <InfoBox type="warning" icon="location_off">
-      {message}
-    </InfoBox>
+    <div className="animate-fade-in">
+      <Alert
+        message="Location Information"
+        description={message}
+        type="warning"
+        showIcon
+        icon={<ExclamationCircleOutlined />}
+        className="rounded-xl border-orange-200 bg-orange-50/80 backdrop-blur-sm"
+      />
+    </div>
   );
 };
 

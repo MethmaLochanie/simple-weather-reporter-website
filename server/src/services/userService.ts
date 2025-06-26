@@ -1,82 +1,65 @@
-import { User } from '../models/User';
-import { AuthResult } from './authService';
-import { SearchHistory, ISearchEntry } from '../models/SearchHistory';
+import { User, IUser } from '../models/User';
 
-interface UserResult {
-  success: boolean;
-  message?: string;
-  error?: string;
-}
+// Cache for user profiles
+const userCache = new Map<string, { data: IUser; expires: number }>();
+const CACHE_TTL_MS = 1000 * 60 * 10; // 10 minutes cache
 
-// Get user profile
-export const getUserProfile = async (userId: string): Promise<AuthResult> => {
+// Get user profile with caching
+export const getUserProfile = async (userId: string): Promise<{ success: boolean; user?: IUser; error?: string }> => {
   try {
-    const user = await User.findById(userId).select({
-      _id: 1,
-      username: 1,
-      email: 1,
-      isVerified: 1,
-      location: 1
+    const now = Date.now();
+    const cacheKey = `profile_${userId}`;
+    
+    // Check cache first
+    const cached = userCache.get(cacheKey);
+    if (cached && cached.expires > now) {
+      return { success: true, user: cached.data };
+    }
+
+    const user = await User.findById(userId).select('-password');
+    if (!user) {
+      return { success: false, error: 'User not found' };
+    }
+
+    // Cache the result
+    userCache.set(cacheKey, {
+      data: user,
+      expires: now + CACHE_TTL_MS
     });
 
-    if (!user) {
-      return { success: false, error: 'User not found' };
-    }
-
-    return {
-      success: true,
-      user: {
-        id: user._id.toString(),
-        username: user.username,
-        email: user.email,
-        isVerified: user.isVerified,
-        location: user.location
-      }
-    };
+    return { success: true, user };
   } catch (error) {
-    console.error('AuthService getUserProfile error:', error);
-    throw error;
+    console.error('Error fetching user profile:', error);
+    return { success: false, error: 'Failed to fetch user profile' };
   }
 };
 
-export const updateUserLocation = async (userId: string, latitude: number, longitude: number): Promise<UserResult> => {
+// Update user location with cache invalidation
+export const updateUserLocation = async (userId: string, latitude: number, longitude: number): Promise<{ success: boolean; error?: string }> => {
   try {
-    const user = await User.findById(userId);
-    if (!user) {
+    const result = await User.findByIdAndUpdate(
+      userId,
+      {
+        location: {
+          latitude,
+          longitude,
+          lastLocationUpdate: new Date().toISOString()
+        }
+      },
+      { new: true }
+    );
+
+    if (!result) {
       return { success: false, error: 'User not found' };
     }
-    user.location = {
-      latitude,
-      longitude,
-      lastLocationUpdate: new Date()
-    };
-    await user.save();
-    return { success: true, message: 'Location updated successfully' };
+
+    // Invalidate user cache
+    const cacheKey = `profile_${userId}`;
+    userCache.delete(cacheKey);
+
+    return { success: true };
   } catch (error) {
-    console.error('UserService updateUserLocation error:', error);
+    console.error('Error updating user location:', error);
     return { success: false, error: 'Failed to update location' };
   }
-};
-
-// // Get a user's search history entry for a city
-// export const getUserSearchHistory = async (userId: string, city: string): Promise<ISearchEntry | null> => {
-//   const history = await SearchHistory.findOne({ userId });
-//   if (!history) return null;
-//   return history.searches.find(s => s.city.toLowerCase() === city.toLowerCase()) || null;
-// };
-
-// // Add a new search entry to user's history if not already present
-// export const addUserSearchHistory = async (userId: string, entry: ISearchEntry): Promise<void> => {
-//   let history = await SearchHistory.findOne({ userId });
-//   if (!history) {
-//     history = new SearchHistory({ userId, searches: [] });
-//   }
-//   const exists = history.searches.some(s =>
-//     s.city.toLowerCase() === entry.city.toLowerCase() &&
-//     s.country.toLowerCase() === entry.country.toLowerCase()
-//   );
-//   if (!exists) {
-//     history.searches.push(entry);
-//     await history.save();
-//   }
-// }; 
+}; 

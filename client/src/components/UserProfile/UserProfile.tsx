@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext/AuthContext';
 import { fetchReverseGeocode } from '../../hooks/useReverseGeocode';
-import LocationStatus from '../LocationStatus/LocationStatus';
-import LocationInfoBox from '../LocationInfoBox/LocationInfoBox';
 import { useLocationStatus } from '../../hooks/useLocationStatus';
-import userApis from '../../api/userApis';
+import { userApis } from '../../api/userApis';
 import { useLoading } from '../../contexts/LoadingContext/LoadingContext';
 import UserProfileTitle from './UserProfileTitle';
 import UserProfileCard from './UserProfileCard';
+import WeatherInfoBox from '../Weather/WeatherInfoBox';
 
 const areCoordsEqual = (
   a: { latitude: number; longitude: number } | null | undefined,
@@ -27,6 +26,7 @@ const UserProfile: React.FC = () => {
   const [liveLocation, setLiveLocation] = useState<{ latitude: number; longitude: number; lastLocationUpdate: string } | null>(null);
   const [locationName, setLocationName] = useState<string>('');
   const [loading, setLocalLoading] = useState<boolean>(false);
+  const lastProcessedCoords = useRef<string>(''); // Track last processed coordinates
 
   useEffect(() => {
     setLoading(loading);
@@ -43,6 +43,7 @@ const UserProfile: React.FC = () => {
     navigator.geolocation.getCurrentPosition(
       async (position: GeolocationPosition) => {
         const { latitude, longitude } = position.coords;
+        const coordsKey = `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
         if (!areCoordsEqual({ latitude, longitude }, user.location)) {
           setLocalLoading(true);
           try {
@@ -50,8 +51,10 @@ const UserProfile: React.FC = () => {
             const updatedProfile = await userApis.getProfile();
             setUser(updatedProfile);
             setLiveLocation({ latitude, longitude, lastLocationUpdate: new Date().toISOString() });
+            lastProcessedCoords.current = coordsKey;
           } catch {
             setLiveLocation({ latitude, longitude, lastLocationUpdate: new Date().toISOString() });
+            lastProcessedCoords.current = coordsKey;
           } finally {
             setLocalLoading(false);
           }
@@ -80,6 +83,11 @@ const UserProfile: React.FC = () => {
       setLocationName('');
       return;
     }
+    const coordsKey = `${loc.latitude.toFixed(4)},${loc.longitude.toFixed(4)}`;
+    // Only fetch if coordinates have changed
+    if (coordsKey === lastProcessedCoords.current && locationName) {
+      return; // Use existing location name
+    }
     let ignore = false;
     (async () => {
       setLocalLoading(true);
@@ -92,6 +100,7 @@ const UserProfile: React.FC = () => {
         } else {
           setLocationName(`${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}`);
         }
+        lastProcessedCoords.current = coordsKey;
       }
       setLocalLoading(false);
     })();
@@ -106,18 +115,29 @@ const UserProfile: React.FC = () => {
   }
 
   return (
-    <div className="text-center py-8">
-      <LocationInfoBox />
-      <UserProfileTitle />
-      <LocationStatus source={locationSource} />
-      <UserProfileCard
-        username={user?.username}
-        email={user?.email}
-        isVerified={user?.isVerified}
-        location={loc}
-        locationName={locationName}
-        userLocationLastUpdate={user?.location?.lastLocationUpdate}
-      />
+    <div className="space-y-6">
+      {/* Location Info Box */}
+      <WeatherInfoBox message={"You have disabled location access. Enable it for more accurate weather updates."} />
+      
+      {/* Profile Header */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100/50">
+        <UserProfileTitle />
+      </div>
+      
+      {/* User Profile Card */}
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="p-6">
+          <UserProfileCard
+            username={user?.username}
+            email={user?.email}
+            isVerified={user?.isVerified}
+            location={loc}
+            locationName={locationName}
+            userLocationLastUpdate={user?.location?.lastLocationUpdate}
+            locationSource={locationSource}
+          />
+        </div>
+      </div>
     </div>
   );
 };

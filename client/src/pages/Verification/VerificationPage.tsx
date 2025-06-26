@@ -11,7 +11,7 @@ const VerificationPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { setLoading } = useLoading();
   
-  const [status, setStatus] = useState<'processing' | 'error'>('processing');
+  const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
   const [message, setMessage] = useState('We are verifying your email, please wait...');
   const hasVerified = useRef(false);
 
@@ -34,27 +34,39 @@ const VerificationPage: React.FC = () => {
       hasVerified.current = true;
       try {
         const response = await verifyEmail(token);
-        navigate('/auth', { 
-          replace: true, 
-          state: { 
-            message: response.message || 'Email verified successfully! You can now log in.'
-          } 
-        });
+        setStatus('success');
+        setMessage(response.message || 'Email verified successfully! You can now log in.');
       } catch (error: any) {
         setStatus('error');
         setMessage(error.response?.data?.error || 'Email verification failed. Please try again.');
-        navigate('/verify', { replace: true });
       }
     };
 
     doVerification();
-  }, [searchParams, verifyEmail, navigate]);
+  }, [searchParams, verifyEmail]);
 
   const renderResult = () => {
     if (status === 'processing') {
       return <Result icon={<Spin size="large" />} title="Verifying Email" subTitle={message} />;
     }
-
+    if (status === 'success') {
+      return (
+        <Result
+          status="success"
+          title="Verification Successful!"
+          subTitle={message}
+          extra={
+            <Button
+              type="primary"
+              className="w-full h-12 rounded-lg bg-gradient-to-r from-green-500 to-blue-600 border-0 text-white font-semibold hover:from-green-600 hover:to-blue-700 transition-all duration-300 hover:-translate-y-0.5"
+              onClick={() => navigate('/auth')}
+            >
+              Go to Login
+            </Button>
+          }
+        />
+      );
+    }
     return (
       <Result
         status="error"
