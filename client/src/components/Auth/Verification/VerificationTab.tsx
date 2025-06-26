@@ -14,7 +14,7 @@ const VerificationTab: React.FC<VerificationTabProps> = ({ status, message, onBa
     return (
       <Result
         icon={<MailOutlined style={{ color: '#1890ff' }} />}
-        title="Check Your Email"
+        title={<span className="text-blue-600 font-semibold">Check Your Email</span>}
         subTitle={message}
         extra={[
           <Button type="default" key="login" onClick={onBackToLogin}>
@@ -30,7 +30,7 @@ const VerificationTab: React.FC<VerificationTabProps> = ({ status, message, onBa
       <Result
         status="success"
         icon={<CheckCircleOutlined />}
-        title="Verification Successful!"
+        title={<span className="text-green-600 font-semibold">Verification Successful!</span>}
         subTitle={message}
         extra={[
           <Button type="primary" key="login" onClick={onBackToLogin}>
@@ -46,7 +46,7 @@ const VerificationTab: React.FC<VerificationTabProps> = ({ status, message, onBa
       <Result
         status="error"
         icon={<CloseCircleOutlined />}
-        title="Verification Failed"
+        title={<span className="text-red-600 font-semibold">Verification Failed</span>}
         subTitle={message}
         extra={[
           <Button type="primary" key="try-again" onClick={onTryAgain}>

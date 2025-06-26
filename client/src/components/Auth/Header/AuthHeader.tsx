@@ -29,10 +29,10 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({ activeTab }) => {
       <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
         <UserOutlined className="text-2xl" />
       </div>
-      <Title level={2} className="text-white mb-2">
+      <Title level={2} className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent mb-2 font-bold">
         {title}
       </Title>
-      <Text className="text-blue-100">
+      <Text className="text-blue-50 font-medium">
         {subtitle}
       </Text>
     </div>

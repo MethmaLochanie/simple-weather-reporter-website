@@ -116,8 +116,10 @@ const UserProfile: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Location Info Box */}
-      <WeatherInfoBox message={"You have disabled location access. Enable it for more accurate weather updates."} />
+      {/* Location Info Box - Only show when location is denied */}
+      {locationStatus === 'denied' && (
+        <WeatherInfoBox message={"You have disabled location access. Enable it for more accurate weather updates."} />
+      )}
       
       {/* Profile Header */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100/50">
