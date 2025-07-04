@@ -84,4 +84,22 @@ export const validateVerificationToken = (req: Request, res: Response, next: Nex
   }
 
   next();
+};
+
+export const validateEmail = (req: Request, res: Response, next: NextFunction): void => {
+  const { email } = req.body;
+  
+  if (!email) {
+    res.status(400).json({ error: 'Email is required' });
+    return;
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    res.status(400).json({ error: 'Invalid email format' });
+    return;
+  }
+
+  next();
 }; 

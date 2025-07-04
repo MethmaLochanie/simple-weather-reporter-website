@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, verifyEmail as verifyEmailService, loginUser } from '../services/authService';
+import { registerUser, verifyEmail as verifyEmailService, loginUser, resendVerificationEmail } from '../services/authService';
 
 // Register user
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -61,5 +61,30 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     console.error('Login controller error:', error);
     res.status(500).json({ error: 'Login failed. Please try again.' });
+  }
+};
+
+// Resend verification email
+export const resendVerification = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email } = req.body;
+    const result = await resendVerificationEmail(email);
+    
+    if (result.success) {
+      res.status(200).json({ message: result.message });
+    } else {
+      res.status(400).json({ error: result.error });
+    }
+  } catch (error: any) {
+    console.error('Resend verification controller error:', error);
+    
+    if (error.message === 'Failed to send verification email') {
+      res.status(500).json({ 
+        error: 'Failed to send verification email. Please try again later.' 
+      });
+      return;
+    }
+    
+    res.status(500).json({ error: 'Failed to resend verification email. Please try again.' });
   }
 };

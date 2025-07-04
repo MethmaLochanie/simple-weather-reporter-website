@@ -76,6 +76,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const resendVerification = async (email: string) => {
+    try {
+      return await authApi.resendVerification(email);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     user,
     token,
@@ -85,6 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     verifyEmail,
+    resendVerification,
     setUser,
   };
 

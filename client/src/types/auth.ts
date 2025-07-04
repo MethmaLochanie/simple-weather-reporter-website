@@ -44,5 +44,6 @@ export interface AuthContextType {
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   verifyEmail: (token: string) => Promise<{ message: string }>;
+  resendVerification: (email: string) => Promise<{ message: string }>;
   setUser: (user: User | null) => void;
 } 

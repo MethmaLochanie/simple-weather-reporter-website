@@ -14,6 +14,7 @@ export interface IUser extends Document {
     longitude: number;
     lastLocationUpdate: Date;
   };
+  lastVerificationEmailSentAt?: Date;
 }
 
 const userSchema = new Schema<IUser>({
@@ -47,6 +48,9 @@ const userSchema = new Schema<IUser>({
     latitude: { type: Number },
     longitude: { type: Number },
     lastLocationUpdate: { type: Date }
+  },
+  lastVerificationEmailSentAt: {
+    type: Date
   }
 }, {
   timestamps: true

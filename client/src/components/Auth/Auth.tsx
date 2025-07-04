@@ -31,7 +31,12 @@ const Auth: React.FC = () => {
       await login(values.email, values.password);
       message.success('Login successful!');
     } catch (error: any) {
-      message.error(error.response?.data?.error || 'Login failed. Please try again.');
+      const errMsg = error.response?.data?.error || 'Login failed. Please try again.';
+      if (errMsg === 'Please verify your email before logging in.') {
+        navigate('/verify', { state: { fromSignup: true, email: values.email } });
+      } else {
+        message.error(errMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -41,9 +46,23 @@ const Auth: React.FC = () => {
     setLoading(true);
     try {
       await register(values.username!, values.email, values.password);
-      message.success('Registration successful! Please check your email for verification.');
+      // Set next allowed resend time (now + 5 minutes) for countdown
+      const next = Date.now() + 5 * 60 * 1000;
+      localStorage.setItem('nextResendTime', next.toString());
+      navigate('/verify', { state: { fromSignup: true, email: values.email } });
     } catch (error: any) {
-      message.error(error.response?.data?.error || 'Registration failed. Please try again.');
+      const errMsg = error.response?.data?.error || 'Registration failed. Please try again.';
+      if (errMsg === 'This email is registered but not yet verified.') {
+        navigate('/verify', {
+          state: {
+            fromSignup: true,
+            verificationMessage: 'This email is registered but not yet verified. Please check your email for the verification link or resend it.',
+            email: values.email
+          }
+        });
+      } else {
+        message.error(errMsg);
+      }
     } finally {
       setLoading(false);
     }
