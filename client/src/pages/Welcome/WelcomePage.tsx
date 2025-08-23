@@ -19,7 +19,7 @@ const WelcomePage: React.FC = () => {
   useEffect(() => {
     const checkApi = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/health`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/health`);
         if (!response.ok) setDemoMode(true);
       } catch {
         setDemoMode(true);
