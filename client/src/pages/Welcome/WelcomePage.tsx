@@ -19,7 +19,15 @@ const WelcomePage: React.FC = () => {
   useEffect(() => {
     const checkApi = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/health`);
+        // Add timeout to prevent hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+        
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/health`, {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
         if (!response.ok) setDemoMode(true);
       } catch {
         setDemoMode(true);
